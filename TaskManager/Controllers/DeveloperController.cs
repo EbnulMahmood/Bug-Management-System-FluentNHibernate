@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using DTOs;
 using Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -48,8 +49,21 @@ namespace TaskManager.Controllers
 
             using var session = FluentNHibernateSession.Instance.OpenSession();
             using var transaction = session.BeginTransaction();
-            IEnumerable<Developer> entities = await session
-                .Query<Developer>().OrderByDescending(d => d.CreatedAt)
+            // IEnumerable<DeveloperDto> entities = await session
+            //     .Query<DeveloperDto>().OrderByDescending(d => d.CreatedAt)
+            //     .Where(d => d.Status != 404)
+            //     .ToListAsync();
+
+            IEnumerable<DeveloperDto> entities = await session
+                .Query<Developer>().Select(d =>
+                new DeveloperDto()
+                {
+                    Id = d.Id,
+                    Name = d.Name,
+                    Status = d.Status,
+                    CreatedAt = d.CreatedAt,
+                })
+                .OrderByDescending(d => d.CreatedAt)
                 .Where(d => d.Status != 404)
                 .ToListAsync();
 
@@ -73,7 +87,14 @@ namespace TaskManager.Controllers
             filterRecord = entities.Count();
 
             //pagination
-            IEnumerable<Developer> paginatdEntities = entities.Skip(start).Take(length)
+            IEnumerable<DeveloperDto> paginatdEntities = entities.Select(d =>
+                new DeveloperDto()
+                {
+                    Id = d.Id,
+                    Name = d.Name,
+                    Status = d.Status,
+                    CreatedAt = d.CreatedAt,
+                }).Skip(start).Take(length)
                 .OrderByDescending(d => d.CreatedAt).ToList().Where(d => d.Status != 404);
 
             List<object> entitiesList = new List<object>();
