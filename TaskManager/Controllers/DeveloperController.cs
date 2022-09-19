@@ -36,16 +36,8 @@ namespace TaskManager.Controllers
             return View(developers);
         }
 
-        // client-side
-        // public IActionResult LoadDevList() {
-        //     IEnumerable<Developer> developers = _unitOfWork.Developers.GetAll()
-        //         .OrderByDescending(d => d.CreatedAt)
-        //         .Where(d => d.Status != 404);
-        //     return Json(new { data = developers});
-        // }
-
         [HttpPost]
-        public JsonResult GetDevList(int draw, int start, int length, string filter_keywords, int filter_option = 0)
+        public async Task<JsonResult> GetDevList(int draw, int start, int length, string filter_keywords, int filter_option = 0)
         {
             int totalRecord = 0;
             int filterRecord = 0;
@@ -56,64 +48,56 @@ namespace TaskManager.Controllers
 
             using var session = FluentNHibernateSession.Instance.OpenSession();
             using var transaction = session.BeginTransaction();
-            IEnumerable<Developer> developers = session
+            IEnumerable<Developer> entities = await session
                 .Query<Developer>().OrderByDescending(d => d.CreatedAt)
                 .Where(d => d.Status != 404)
-                .ToList();
+                .ToListAsync();
 
             transaction.Commit();
 
             //get total count of data in table
-            totalRecord = developers.Count();
+            totalRecord = entities.Count();
 
             if (!string.IsNullOrEmpty(filter_keywords))
             {
-                developers = developers.Where(d => d.Name.ToLower().Contains(filter_keywords.ToLower()))
+                entities = entities.Where(d => d.Name.ToLower().Contains(filter_keywords.ToLower()))
                 .Where(d => d.Status != 404);
             }
             if (filter_option != 0)
             {
-                developers = developers.Where(d => d.Status == filter_option)
+                entities = entities.Where(d => d.Status == filter_option)
                 .Where(d => d.Status != 404);
             }
 
             // get total count of records after search 
-            filterRecord = developers.Count();
+            filterRecord = entities.Count();
 
             //pagination
-            IEnumerable<Developer> devList = developers.Skip(start).Take(length)
+            IEnumerable<Developer> paginatdEntities = entities.Skip(start).Take(length)
                 .OrderByDescending(d => d.CreatedAt).ToList().Where(d => d.Status != 404);
 
-            List<object> dataList = new List<object>();
-            foreach(var item in devList)
+            List<object> entitiesList = new List<object>();
+            foreach(var item in paginatdEntities)
             {
                 string actionLink = $"<div class='w-75 btn-group' role='group'>" +
-                    $"<a href='Developer/Edit/{item.Id}'" +
-                    $"class='btn btn-primary mx-2'><i class='bi bi-pencil-square'></i>Edit</a>" +
+                    $"<a href='Developer/Edit/{item.Id}' class='btn btn-primary mx-2'><i class='bi bi-pencil-square'></i>Edit</a>" +
                     $"<button data-bs-target='#deleteDev' data-bs-toggle='ajax-modal' class='btn btn-danger mx-2 btn-delete'" +
-                    $"data-dev-id='{item.Id}'>Delete</button><a href='Developer/Details/{item.Id}' class='btn btn-secondary mx-2'>" +
-                    $"<i class='bi bi-trash-fill'></i>Details</a></div>";
+                    $"data-dev-id='{item.Id}'><i class='bi bi-trash-fill'></i>Delete</button><a href='Developer/Details/{item.Id}'" +
+                    $"class='btn btn-secondary mx-2'><i class='bi bi-ticket-detailed-fill'></i>Details</a></div>";
                 string statusConditionClass = item.Status == 1 ? "text-success" : "text-danger";
                 string statusConditionText = item.Status == 1 ? "Active" : "Inactive";
                 string status = $"<span class='{statusConditionClass}'>{statusConditionText}</span>";
-
-                // Dictionary<string, string> dataItems = new Dictionary<string, string>();
-                // dataItems.Add("name", item.Name);
-                // dataItems.Add("status", status);
-                // dataItems.Add("CustomStatus", item.Status == 1 ? "Active": "Inactive");
-                // dataItems.Add("action", actionLink);
 
                 List<string> dataItems = new List<string>();
                 dataItems.Add(item.Name);
                 dataItems.Add(status);
                 dataItems.Add(actionLink);
 
-                dataList.Add(dataItems);
+                entitiesList.Add(dataItems);
             }
 
-            var returnObj = new { draw = draw, recordsTotal = totalRecord,
-                recordsFiltered = filterRecord, data = dataList };
-            return Json(returnObj);
+            return Json(new { draw = draw, recordsTotal = totalRecord,
+                recordsFiltered = filterRecord, data = entitiesList });
         }
 
         public IActionResult Create()
@@ -123,83 +107,98 @@ namespace TaskManager.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Developer developer)
+        public async Task<IActionResult> Create(Developer entity)
         {
             if (ModelState.IsValid)
             {
                 using var session = FluentNHibernateSession.Instance.OpenSession();
                 using var transaction = session.BeginTransaction();
-                session.Save(developer);
+                await session.SaveAsync(entity);
                 transaction.Commit();
                 TempData["success"] = "Developer created successfully!";
                 return RedirectToAction("Index");
             }
-            return View(developer);
+            return View(entity);
         }
 
-        // public async Task<IActionResult> Edit(Guid? id)
-        // {
-        //     if (id == null)
-        //     {
-        //         return NotFound();
-        //     }
-        //     var developer = await _session.Developers.FirstOrDefaultAsync(d => d.Id == id);
-        //     if (developer == null || developer.Status == 404)
-        //     {
-        //         return NotFound();
-        //     }
-        //     return View(developer);
-        // }
+        public async Task<IActionResult> Edit(Guid? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            using var session = FluentNHibernateSession.Instance.OpenSession();
+            using var transaction = session.BeginTransaction();
+            var entity = await session.GetAsync<Developer>(id);
+            transaction.Commit();
+            if (entity == null || entity.Status == 404)
+            {
+                return NotFound();
+            }
+            return View(entity);
+        }
 
-        // [HttpPost]
-        // [ValidateAntiForgeryToken]
-        // public async Task<IActionResult> Edit(Developer developer)
-        // {
-        //     if (ModelState.IsValid)
-        //     {
-        //         await _session.Save(developer);
-        //         TempData["success"] = "Developer updated successfully!";
-        //         return RedirectToAction("Index");
-        //     }
-        //     return View(developer);
-        // }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(Developer entity)
+        {
+            if (ModelState.IsValid)
+            {
+                using var session = FluentNHibernateSession.Instance.OpenSession();
+                using var transaction = session.BeginTransaction();
+                await session.UpdateAsync(entity);
+                transaction.Commit();
+                TempData["success"] = "Developer updated successfully!";
+                return RedirectToAction("Index");
+            }
+            return View(entity);
+        }
 
-        // public async Task<IActionResult> Delete(Guid? id)
-        // {
-        //     if (id == null)
-        //     {
-        //         return NotFound();
-        //     }
-        //     var developer = await _session.Developers.FirstOrDefaultAsync(d => d.Id == id);
-        //     if (developer == null || developer.Status == 404)
-        //     {
-        //         return NotFound();
-        //     }
-        //     return PartialView("_DevDeletePartial", developer);
-        // }
+        public async Task<IActionResult> Delete(Guid? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            using var session = FluentNHibernateSession.Instance.OpenSession();
+            using var transaction = session.BeginTransaction();
+            var entity = await session.GetAsync<Developer>(id);
+            transaction.Commit();
+            if (entity == null || entity.Status == 404)
+            {
+                return NotFound();
+            }
+            return PartialView("_DevDeletePartial", entity);
+        }
 
-        // [HttpPost, ActionName("Delete")]
-        // [ValidateAntiForgeryToken]
-        // public async Task<IActionResult> DeletePost(Guid? id)
-        // {
-        //     var developer = await _session.Developers.FirstOrDefaultAsync(d => d.Id == id);
-        //     if (developer == null || developer.Status == 404)
-        //     {
-        //         return NotFound();
-        //     }
-        //     developer.Status = 404;
-        //     await _session.Save(developer);
-        //     TempData["success"] = "Developer deleted successfully!";
-        //     return RedirectToAction("Index");
-        // }
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeletePost(Guid? id)
+        {
+            using var session = FluentNHibernateSession.Instance.OpenSession();
+            using var transaction = session.BeginTransaction();
+            var entity = await session.GetAsync<Developer>(id);
+            if (entity == null || entity.Status == 404)
+            {
+                return NotFound();
+            }
+            entity.Status = 404;
+            await session.UpdateAsync(entity);
+            transaction.Commit();
+            TempData["success"] = "Developer deleted successfully!";
+            return RedirectToAction("Index");
+        }
 
-        // public async Task<IActionResult> Details(Guid? id)
-        // {
-        //     if (id == null) return NotFound();
-        //     var developer = await _session.Developers.FirstOrDefaultAsync(d => d.Id == id);
-        //     if (developer == null || developer.Status == 404) return NotFound();
-        //     return View(developer);
-        // }
+        public async Task<IActionResult> Details(Guid? id)
+        {
+            if (id == null) return NotFound();
+            using var session = FluentNHibernateSession.Instance.OpenSession();
+            using var transaction = session.BeginTransaction();
+            var entity = await session.GetAsync<Developer>(id);
+            transaction.Commit();
+            if (entity == null || entity.Status == 404) return NotFound();
+            return View(entity);
+        }
 
         // [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         // public IActionResult Error()
