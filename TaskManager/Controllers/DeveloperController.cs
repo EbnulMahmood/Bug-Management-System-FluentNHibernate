@@ -23,17 +23,17 @@ namespace TaskManager.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             using var session = FluentNHibernateSession.Instance.OpenSession();
             using var transaction = session.BeginTransaction();
-            IEnumerable<Developer> developers = session
+            IEnumerable<Developer> entities = await session
                 .Query<Developer>().OrderByDescending(d => d.CreatedAt)
                 .Where(d => d.Status != 404)
-                .ToList();
+                .ToListAsync();
 
             transaction.Commit();
-            return View(developers);
+            return View(entities);
         }
 
         [HttpPost]
@@ -96,8 +96,13 @@ namespace TaskManager.Controllers
                 entitiesList.Add(dataItems);
             }
 
-            return Json(new { draw = draw, recordsTotal = totalRecord,
-                recordsFiltered = filterRecord, data = entitiesList });
+            return Json(new
+            {
+                draw = draw,
+                recordsTotal = totalRecord,
+                recordsFiltered = filterRecord,
+                data = entitiesList
+            });
         }
 
         public IActionResult Create()

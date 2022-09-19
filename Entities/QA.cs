@@ -10,7 +10,7 @@ namespace Entities
 {
     public class QA
     {
-        public virtual Guid Id { get; protected set; }
+        public virtual Guid Id { get; set; }
         public virtual string Name { get; set; }
         public virtual int Status { get; set; } = 1;
         public virtual DateTime CreatedAt { get; set; } = DateTime.Now;

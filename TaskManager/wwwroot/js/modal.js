@@ -19,15 +19,17 @@ const modalAction = (PlaceHolderElement, that) => {
 
 // qa modal
 $(function () {
-    const PlaceHolderElementQa = $('#modal-placeholder-qa');
-    $('button[data-bs-toggle="ajax-modal"]').click(function (e) {
-        const url = $(this).attr('data-url');
-        showModal(url, PlaceHolderElementQa);
+    const PlaceHolderElementDev = $('#modal-placeholder-dev');
+    $(document).on("click", ".btn-delete", function() {
+        const id = $(this).attr('data-qa-id');
+        const url = `QA/Delete/${id}`;
+        showModal(url, PlaceHolderElementDev);
+    });
+
+    PlaceHolderElementDev.on('click', '[data-bs-save="modal"]', function (e) {
+        modalAction(PlaceHolderElementDev, $(this))
     })
-    PlaceHolderElementQa.on('click', '[data-bs-save="modal"]', function (e) {
-        modalAction(PlaceHolderElementQa, $(this));
-    })
-});
+})
 
 // dev modal
 $(function () {
