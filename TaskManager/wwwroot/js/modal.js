@@ -19,7 +19,7 @@ const modalAction = (PlaceHolderElement, that) => {
 
 // qa modal
 $(function () {
-    const PlaceHolderElementDev = $('#modal-placeholder-dev');
+    const PlaceHolderElementDev = $('#modal-placeholder-qa');
     $(document).on("click", ".btn-delete", function() {
         const id = $(this).attr('data-qa-id');
         const url = `QA/Delete/${id}`;
