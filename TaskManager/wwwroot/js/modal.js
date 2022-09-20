@@ -20,7 +20,7 @@ const modalAction = (PlaceHolderElement, that) => {
 // qa modal
 $(function () {
     const PlaceHolderElementDev = $('#modal-placeholder-qa');
-    $(document).on("click", ".btn-delete", function() {
+    $(document).on("click", ".btn-qa-delete", function() {
         const id = $(this).attr('data-qa-id');
         const url = `QA/Delete/${id}`;
         showModal(url, PlaceHolderElementDev);
@@ -34,7 +34,7 @@ $(function () {
 // dev modal
 $(function () {
     const PlaceHolderElementDev = $('#modal-placeholder-dev');
-    $(document).on("click", ".btn-delete", function() {
+    $(document).on("click", ".btn-dev-delete", function() {
         const id = $(this).attr('data-dev-id');
         const url = `Developer/Delete/${id}`;
         showModal(url, PlaceHolderElementDev);

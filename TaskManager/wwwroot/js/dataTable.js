@@ -10,7 +10,7 @@ $(document).ready(function() {
         searching: false,
         dom: '<"top"l>rt<"bottom"ip><"clear">',
         ajax: {
-            url: "Developer/GetDevList",
+            url: "Developer/ListDevelopers",
             type: "POST",
             dataType: "json",
             data: (data) => {

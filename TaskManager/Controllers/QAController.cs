@@ -72,7 +72,7 @@ namespace TaskManager.Controllers
             {
                 string actionLink = $"<div class='w-75 btn-group' role='group'>" +
                     $"<a href='QA/Edit/{item.Id}' class='btn btn-primary mx-2'><i class='bi bi-pencil-square'></i>Edit</a>" +
-                    $"<button data-bs-target='#deleteQA' data-bs-toggle='ajax-modal' class='btn btn-danger mx-2 btn-delete'" +
+                    $"<button data-bs-target='#deleteQA' data-bs-toggle='ajax-modal' class='btn btn-danger mx-2 btn-qa-delete'" +
                     $"data-qa-id='{item.Id}'><i class='bi bi-trash-fill'></i>Delete</button><a href='QA/Details/{item.Id}'" +
                     $"class='btn btn-secondary mx-2'><i class='bi bi-ticket-detailed-fill'></i>Details</a></div>";
                 string statusConditionClass = item.Status == 1 ? "text-success" : "text-danger";

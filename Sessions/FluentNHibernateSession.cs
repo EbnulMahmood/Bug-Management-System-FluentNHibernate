@@ -3,6 +3,7 @@ using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
 using Mappings;
 using NHibernate;
+using NHibernate.Cfg;
 using NHibernate.Tool.hbm2ddl;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ namespace Sessions
     public static class FluentNHibernateSession
     {
         private static ISessionFactory _sessionFactory;
-        // private static string _connectionString = ConfigurationManager.ConnectionStrings();
+        // static string defaultConnection = ConfigurationManager.ConnectionStrings["DefaultConnection"].ToString();
         public static ISessionFactory Instance
         {
             get
