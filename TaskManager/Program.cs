@@ -1,10 +1,7 @@
-using Configurations;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddAutoMapper(typeof(MapperInitializer));
 string defaultConnection = builder.Configuration.GetConnectionString("DefaultConnection");
 
 var app = builder.Build();

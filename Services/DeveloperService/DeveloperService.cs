@@ -8,8 +8,6 @@ using System.Text;
 using System.Threading.Tasks;
 using NHibernate.Linq;
 using FluentNHibernate.Data;
-using AutoMapper;
-using Models;
 using System.Web.Mvc;
 using ModelStateDictionary = Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary;
 
@@ -17,13 +15,8 @@ namespace Services.DeveloperService
 {
     public class DeveloperService : IDeveloperService
     {
-        private readonly ModelStateDictionary _modelState;
-        private readonly IMapper _mapper;
-
-        public DeveloperService(ModelStateDictionary modelState, IMapper mapper)
+        public DeveloperService()
         {
-            _modelState = modelState;
-            _mapper = mapper;
         }
 
         public async Task<object> ListDevelopersDescExclude404(int draw, int start, int length,
@@ -35,15 +28,8 @@ namespace Services.DeveloperService
             using var session = FluentNHibernateSession.Instance.OpenSession();
             using var transaction = session.BeginTransaction();
 
-            IEnumerable<DeveloperDto> entities = await session
-                .Query<Developer>().Select(d =>
-                new DeveloperDto()
-                {
-                    Id = d.Id,
-                    Name = d.Name,
-                    Status = d.Status,
-                    CreatedAt = d.CreatedAt,
-                })
+            IEnumerable<Developer> entities = await session
+                .Query<Developer>()
                 .OrderByDescending(d => d.CreatedAt)
                 .Where(d => d.Status != 404)
                 .ToListAsync();
@@ -68,8 +54,8 @@ namespace Services.DeveloperService
             filterRecord = entities.Count();
 
             //pagination
-            IEnumerable<DeveloperDto> paginatdEntities = entities.Select(d =>
-                new DeveloperDto()
+            IEnumerable<Developer> paginatdEntities = entities.Select(d =>
+                new Developer()
                 {
                     Id = d.Id,
                     Name = d.Name,
@@ -145,7 +131,7 @@ namespace Services.DeveloperService
             }
         }
 
-        public async Task<DeveloperDto?> GetDeveloperExclude404(Guid? developerToGetId)
+        public async Task<Developer?> GetDeveloperExclude404(Guid? developerToGetId)
         {
             try
             {
@@ -156,11 +142,9 @@ namespace Services.DeveloperService
                 var entity = await session.GetAsync<Developer>(developerToGetId);
                 transaction.Commit();
 
-                var result = _mapper.Map<DeveloperDto>(entity);
+                if (entity == null || entity.Status == 404) return null;
 
-                if (result == null || result.Status == 404) return null;
-
-                return result;
+                return entity;
             }
             catch
             {

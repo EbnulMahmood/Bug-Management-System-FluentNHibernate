@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using Models;
 using Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,23 +11,18 @@ using NHibernate;
 using NHibernate.Linq;
 using NHibernate.Mapping.ByCode.Impl;
 using Services.DeveloperService;
-using Sessions;
-using AutoMapper;
-using ISession = NHibernate.ISession;
 
 namespace TaskManager.Controllers
 {
     public class DeveloperController : Controller
     {
         private readonly ILogger<DeveloperController> _logger;
-        private readonly ISession _session;
         private readonly IDeveloperService _service;
 
-        public DeveloperController(ILogger<DeveloperController> logger, IMapper mapper, ISession session)
+        public DeveloperController(ILogger<DeveloperController> logger)
         {
             _logger = logger;
-            _session = session;
-            _service = new DeveloperService(this.ModelState, mapper);
+            _service = new DeveloperService();
         }
 
         public IActionResult Index()
