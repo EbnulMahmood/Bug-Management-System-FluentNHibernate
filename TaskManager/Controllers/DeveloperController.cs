@@ -1,15 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 using Entities;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using NHibernate;
-using NHibernate.Linq;
-using NHibernate.Mapping.ByCode.Impl;
 using Services.DeveloperService;
 
 namespace TaskManager.Controllers

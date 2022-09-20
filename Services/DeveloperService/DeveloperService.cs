@@ -9,28 +9,21 @@ using System.Threading.Tasks;
 using NHibernate.Linq;
 using FluentNHibernate.Data;
 using System.Web.Mvc;
-using ModelStateDictionary = Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary;
+using DAOs.DeveloperDao;
 
 namespace Services.DeveloperService
 {
     public class DeveloperService : IDeveloperService
     {
+        private readonly IDeveloperDao _developerDao;
         public DeveloperService()
         {
+            _developerDao = new DeveloperDao();
         }
 
         public async Task<IEnumerable<Developer>> ListDevelopersDescExclude404()
         {
-            using var session = FluentNHibernateSession.Instance.OpenSession();
-            using var transaction = session.BeginTransaction();
-
-            IEnumerable<Developer> entities = await session
-                .Query<Developer>()
-                .OrderByDescending(d => d.CreatedAt)
-                .Where(d => d.Status != 404)
-                .ToListAsync();
-
-            transaction.Commit();
+            var entities = await _developerDao.ListDevelopersDescExclude404();
 
             return entities;
         }
@@ -39,11 +32,7 @@ namespace Services.DeveloperService
         {
             try
             {
-                using var session = FluentNHibernateSession.Instance.OpenSession();
-                using var transaction = session.BeginTransaction();
-                await session.SaveAsync(developerToCreate);
-                transaction.Commit();
-
+                if(!await _developerDao.CreateDeveloper(developerToCreate)) return false;
                 return true;
             }
             catch
@@ -56,11 +45,20 @@ namespace Services.DeveloperService
         {
             try
             {
-                using var session = FluentNHibernateSession.Instance.OpenSession();
-                using var transaction = session.BeginTransaction();
-                await session.UpdateAsync(developerToUpdate);
-                transaction.Commit();
+                if (!await _developerDao.UpdateDeveloper(developerToUpdate)) return false;
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
 
+        public async Task<bool> DeleteDeveloperInclude404(Guid? developerToGetId)
+        {
+            try
+            {
+                if (!await _developerDao.DeleteDeveloperInclude404(developerToGetId)) return false;
                 return true;
             }
             catch
@@ -75,34 +73,14 @@ namespace Services.DeveloperService
             {
                 if (developerToGetId == null) return null;
 
-                using var session = FluentNHibernateSession.Instance.OpenSession();
-                using var transaction = session.BeginTransaction();
-                var entity = await session.GetAsync<Developer>(developerToGetId);
-                transaction.Commit();
-
-                if (entity == null || entity.Status == 404) return null;
-
+                var entity = await _developerDao.GetDeveloperExclude404(developerToGetId);
+                if (entity == null) return null;
                 return entity;
             }
             catch
             {
                 return null;
             }
-        }
-
-        public async Task<bool> DeleteDeveloperInclude404(Guid? developerToGetId)
-        {
-            using var session = FluentNHibernateSession.Instance.OpenSession();
-            using var transaction = session.BeginTransaction();
-            var entity = await session.GetAsync<Developer>(developerToGetId);
-
-            if (entity.Status == 404) return false;
-            entity.Status = 404;
-            await session.UpdateAsync(entity);
-
-            transaction.Commit();
-
-            return true;
         }
     }
 }
