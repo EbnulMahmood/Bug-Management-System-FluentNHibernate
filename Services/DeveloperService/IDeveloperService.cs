@@ -10,7 +10,7 @@ namespace Services.DeveloperService
 {
     public interface IDeveloperService
     {
-        Task<object> ListDevelopersDescExclude404(int draw, int start, int length, string filter_keywords, int filter_option = 0);
+        Task<IEnumerable<Developer>> ListDevelopersDescExclude404();
         Task<bool> CreateDeveloper(Developer developerToCreate);
         Task<bool> UpdateDeveloper(Developer developerToUpdate);
         Task<Developer?> GetDeveloperExclude404(Guid? developerToGetId);
