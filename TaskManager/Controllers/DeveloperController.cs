@@ -49,6 +49,7 @@ namespace TaskManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Developer entity)
         {
+            if (!ModelState.IsValid) return View(entity);
             if (!await _service.CreateDeveloper(entity)) return View(entity);
             TempData["success"] = "Developer created successfully!";
             return RedirectToAction("Index");
@@ -65,6 +66,7 @@ namespace TaskManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Developer entity)
         {
+            if (!ModelState.IsValid) return View(entity);
             if (!await _service.UpdateDeveloper(entity)) return View(entity);
             TempData["success"] = "Developer updated successfully!";
             return RedirectToAction("Index");

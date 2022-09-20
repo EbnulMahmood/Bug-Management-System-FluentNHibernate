@@ -97,8 +97,6 @@ namespace Services.DeveloperService
         {
             try
             {
-                if (!_modelState.IsValid) return false;
-
                 using var session = FluentNHibernateSession.Instance.OpenSession();
                 using var transaction = session.BeginTransaction();
                 await session.SaveAsync(developerToCreate);
@@ -116,8 +114,6 @@ namespace Services.DeveloperService
         {
             try
             {
-                if (!_modelState.IsValid) return false;
-
                 using var session = FluentNHibernateSession.Instance.OpenSession();
                 using var transaction = session.BeginTransaction();
                 await session.UpdateAsync(developerToUpdate);
