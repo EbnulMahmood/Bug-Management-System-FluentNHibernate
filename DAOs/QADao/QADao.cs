@@ -1,75 +1,154 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Entities;
 using NHibernate;
-using NHibernate.Linq;
+using NHibernate.Criterion;
 
 namespace DAOs.QADao
 {
     public class QADao : IQADao
     {
         private readonly ISession _session;
-        private ITransaction? _transaction;
+        private readonly ICriteria _qACriteria;
 
         public QADao(ISession session)
         {
             _session = session;
+            _qACriteria = _session.CreateCriteria<QA>();
         }
 
         public async Task<IEnumerable<QA>> ListQAsDescExclude404()
         {
-            _transaction = _session.BeginTransaction();
-            IEnumerable<QA> entities = await _session
-                .Query<QA>()
-                .OrderByDescending(d => d.CreatedAt)
-                .Where(d => d.Status != 404)
-                .ToListAsync();
+            using var transaction = _session.BeginTransaction();
+            int deleteStatus = 404;
+            try
+            {
+                IEnumerable<QA> entities = await _qACriteria
+                    .AddOrder(Order.Desc("CreatedAt"))
+                    .Add(!Restrictions.Eq("Status", deleteStatus))
+                    .ListAsync<QA>();
+                await transaction.CommitAsync();
 
-            _transaction.Commit();
-            return entities;
+                return entities;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw new Exception();
+            }
+            finally
+            {
+                if (transaction != null)
+                {
+                    transaction.Dispose();
+                }
+            }
         }
 
         public async Task<bool> CreateQA(QA qAToCreate)
         {
-            _transaction = _session.BeginTransaction();
-            await _session.SaveAsync(qAToCreate);
-            _transaction.Commit();
-            return true;
+            using var transaction = _session.BeginTransaction();
+            try
+            {
+                await _session.SaveAsync(qAToCreate);
+                await transaction.CommitAsync();
+
+                return true;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw new Exception();
+            }
+            finally
+            {
+                if (transaction != null)
+                {
+                    transaction.Dispose();
+                }
+            }
         }
 
         public async Task<bool> UpdateQA(QA qAToUpdate)
         {
-            _transaction = _session.BeginTransaction();
-            await _session.UpdateAsync(qAToUpdate);
-            _transaction.Commit();
-            return true;
+            using var transaction = _session.BeginTransaction();
+            try
+            {
+                await _session.UpdateAsync(qAToUpdate);
+                await transaction.CommitAsync();
+
+                return true;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw new Exception();
+            }
+            finally
+            {
+                if (transaction != null)
+                {
+                    transaction.Dispose();
+                }
+            }
         }
         
         public async Task<bool> DeleteQAInclude404(Guid? qAToGetId)
         {
-            _transaction = _session.BeginTransaction();
-            var entity = await _session.GetAsync<QA>(qAToGetId);
+            using var transaction = _session.BeginTransaction();
+            int deleteStatus = 404;
+            try
+            {
+                var entity = await _session.GetAsync<QA>(qAToGetId);
 
-            if (entity.Status == 404) return false;
-            entity.Status = 404;
-            await _session.UpdateAsync(entity);
+                if (entity == null || entity.Status == deleteStatus) return false;
+                entity.Status = deleteStatus;
+                await _session.UpdateAsync(entity);
+                await transaction.CommitAsync();
 
-            _transaction.Commit();
-            return true;
+                return true;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw new Exception();
+            }
+            finally
+            {
+                if (transaction != null)
+                {
+                    transaction.Dispose();
+                }
+            }
         }
 
         public async Task<QA?> GetQAExclude404(Guid? qAToGetId)
         {
-            _transaction = _session.BeginTransaction();
-            var entity = await _session.GetAsync<QA>(qAToGetId);
-            _transaction.Commit();
+            using var transaction = _session.BeginTransaction();
+            int deleteStatus = 404;
+            try
+            {
+                var entity = await _session.GetAsync<QA>(qAToGetId);
 
-            if (entity == null || entity.Status == 404) return null;
+                if (entity == null || entity.Status == deleteStatus) return null;
+                await transaction.CommitAsync();
 
-            return entity;
+                return entity;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw new Exception();
+            }
+            finally
+            {
+                if (transaction != null)
+                {
+                    transaction.Dispose();
+                }
+            }
         }
     }
 }

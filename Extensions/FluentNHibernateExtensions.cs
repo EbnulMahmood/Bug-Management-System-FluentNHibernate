@@ -21,9 +21,7 @@ namespace Extensions
         {
             var sessionFactory = Fluently.Configure()
                 .Database(MsSqlConfiguration.MsSql2012
-                .ConnectionString(
-                    connectionString
-                ))
+                .ConnectionString(connectionString))
                 .Mappings(m =>
                 {
                     m.FluentMappings.AddFromAssemblyOf<DeveloperMap>();
