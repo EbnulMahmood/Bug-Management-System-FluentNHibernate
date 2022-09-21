@@ -10,10 +10,10 @@ namespace Services.DeveloperService
 {
     public interface IDeveloperService
     {
-        Task<IEnumerable<Developer>> ListDevelopersDescExclude404();
-        Task<bool> CreateDeveloper(Developer developerToCreate);
-        Task<bool> UpdateDeveloper(Developer developerToUpdate);
-        Task<Developer?> GetDeveloperExclude404(Guid? developerToGetId);
-        Task<bool> DeleteDeveloperInclude404(Guid? developerToGetId);
+        Task<IEnumerable<Developer>> ListEntities();
+        Task<bool> CreateEntity(Developer entity);
+        Task<bool> UpdateEntity(Developer entity);
+        Task<Developer?> GetEntity(Guid? id);
+        Task<bool> DeleteEntity(Guid? id);
     }
 }

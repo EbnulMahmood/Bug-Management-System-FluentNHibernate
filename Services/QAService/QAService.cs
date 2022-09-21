@@ -7,30 +7,30 @@ using System.Text;
 using System.Threading.Tasks;
 using NHibernate.Linq;
 using System.Web.Mvc;
-using DAOs.DeveloperDao;
+using DAOs.QADao;
 
-namespace Services.DeveloperService
+namespace Services.QAService
 {
-    public class DeveloperService : IDeveloperService
+    public class QAService : IQAService
     {
-        private readonly IDeveloperDao _developerDao;
-        public DeveloperService(IDeveloperDao developerDao)
+        private readonly IQADao _qADao;
+        public QAService(IQADao qADao)
         {
-            _developerDao = developerDao;
+            _qADao = qADao;
         }
 
-        public async Task<IEnumerable<Developer>> ListEntities()
+        public async Task<IEnumerable<QA>> ListEntities()
         {
-            var entities = await _developerDao.ListDevelopersDescExclude404();
+            var entities = await _qADao.ListQAsDescExclude404();
 
             return entities;
         }
         
-        public async Task<bool> CreateEntity(Developer entity)
+        public async Task<bool> CreateEntity(QA entity)
         {
             try
             {
-                if(!await _developerDao.CreateDeveloper(entity)) return false;
+                if(!await _qADao.CreateQA(entity)) return false;
                 return true;
             }
             catch
@@ -39,11 +39,11 @@ namespace Services.DeveloperService
             }
         }
 
-        public async Task<bool> UpdateEntity(Developer entity)
+        public async Task<bool> UpdateEntity(QA entity)
         {
             try
             {
-                if (!await _developerDao.UpdateDeveloper(entity)) return false;
+                if (!await _qADao.UpdateQA(entity)) return false;
                 return true;
             }
             catch
@@ -56,7 +56,7 @@ namespace Services.DeveloperService
         {
             try
             {
-                if (!await _developerDao.DeleteDeveloperInclude404(id)) return false;
+                if (!await _qADao.DeleteQAInclude404(id)) return false;
                 return true;
             }
             catch
@@ -65,13 +65,13 @@ namespace Services.DeveloperService
             }
         }
 
-        public async Task<Developer?> GetEntity(Guid? id)
+        public async Task<QA?> GetEntity(Guid? id)
         {
             try
             {
                 if (id == null) return null;
 
-                var entity = await _developerDao.GetDeveloperExclude404(id);
+                var entity = await _qADao.GetQAExclude404(id);
                 if (entity == null) return null;
                 return entity;
             }

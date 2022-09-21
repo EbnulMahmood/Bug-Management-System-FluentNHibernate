@@ -9,10 +9,10 @@ namespace TaskManager.Controllers
         private readonly ILogger<DeveloperController> _logger;
         private readonly IDeveloperService _service;
 
-        public DeveloperController(ILogger<DeveloperController> logger)
+        public DeveloperController(ILogger<DeveloperController> logger, IDeveloperService service)
         {
             _logger = logger;
-            _service = new DeveloperService();
+            _service = service;
         }
 
         public IActionResult Index()
@@ -24,7 +24,7 @@ namespace TaskManager.Controllers
         public async Task<JsonResult> ListDevelopers(int draw, int start, int length,
             string filter_keywords, int filter_option = 0)
         {
-            var entities = await _service.ListDevelopersDescExclude404();
+            var entities = await _service.ListEntities();
             int totalRecord = 0;
             int filterRecord = 0;
 
@@ -88,14 +88,14 @@ namespace TaskManager.Controllers
         public async Task<IActionResult> Create(Developer entity)
         {
             if (!ModelState.IsValid) return View(entity);
-            if (!await _service.CreateDeveloper(entity)) return View(entity);
+            if (!await _service.CreateEntity(entity)) return View(entity);
             TempData["success"] = "Developer created successfully!";
             return RedirectToAction("Index");
         }
 
         public async Task<IActionResult> Edit(Guid? id)
         {
-            var entity = await _service.GetDeveloperExclude404(id);
+            var entity = await _service.GetEntity(id);
             if (entity == null) return NotFound();
             return View(entity);
         }
@@ -105,7 +105,7 @@ namespace TaskManager.Controllers
         public async Task<IActionResult> Edit(Developer entity)
         {
             if (!ModelState.IsValid) return View(entity);
-            if (!await _service.UpdateDeveloper(entity)) return View(entity);
+            if (!await _service.UpdateEntity(entity)) return View(entity);
             TempData["success"] = "Developer updated successfully!";
             return RedirectToAction("Index");
         }
@@ -114,7 +114,7 @@ namespace TaskManager.Controllers
         {
             string devDeletePartial = "_DevDeletePartial";
 
-            var entity = await _service.GetDeveloperExclude404(id);
+            var entity = await _service.GetEntity(id);
             if (entity == null) return NotFound();
 
             return PartialView(devDeletePartial, entity);
@@ -124,14 +124,14 @@ namespace TaskManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeletePost(Guid? id)
         {
-            if (!await _service.DeleteDeveloperInclude404(id)) return NotFound();
+            if (!await _service.DeleteEntity(id)) return NotFound();
             TempData["success"] = "Developer deleted successfully!";
             return RedirectToAction("Index");
         }
 
         public async Task<IActionResult> Details(Guid? id)
         {
-            var entity = await _service.GetDeveloperExclude404(id);
+            var entity = await _service.GetEntity(id);
             if (entity == null) return NotFound();
             return View(entity);
         }

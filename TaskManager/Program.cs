@@ -1,8 +1,14 @@
+using Extensions;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
 string defaultConnection = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrEmpty(defaultConnection)) throw new Exception("Missing connection string");
+
+builder.Services.AddFluentNHibernate(defaultConnection);
 
 var app = builder.Build();
 

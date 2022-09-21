@@ -2,49 +2,33 @@
 using FluentNHibernate.Data;
 using Microsoft.AspNetCore.Mvc;
 using NHibernate.Linq;
-using Sessions;
+using Services.QAService;
 
 namespace TaskManager.Controllers
 {
     public class QAController : Controller
     {
         private readonly ILogger<QAController> _logger;
-        public QAController(ILogger<QAController> logger)
+        private readonly IQAService _service;
+        public QAController(ILogger<QAController> logger, IQAService service)
         {
             _logger = logger;
+            _service = service;
         }
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            using var session = FluentNHibernateSession.Instance.OpenSession();
-            using var transaction = session.BeginTransaction();
-            IEnumerable<QA> entities = await session
-                .Query<QA>().OrderByDescending(d => d.CreatedAt)
-                .Where(d => d.Status != 404)
-                .ToListAsync();
-
-            transaction.Commit();
-            return View(entities);
+            return View();
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetQAList(int draw, int start, int length, string filter_keywords, int filter_option = 0)
+        public async Task<JsonResult> GetQAList(int draw, int start, int length,
+            string filter_keywords, int filter_option = 0)
         {
+            var entities = await _service.ListEntities();
+
             int totalRecord = 0;
             int filterRecord = 0;
-
-            var sortColumn = Request.Form["columns[" + Request.Form["order[0][column]"].FirstOrDefault() + "][name]"].FirstOrDefault();
-            var sortColumnDirection = Request.Form["order[0][dir]"].FirstOrDefault();
-            var searchValue = Request.Form["search[value]"].FirstOrDefault();
-
-            using var session = FluentNHibernateSession.Instance.OpenSession();
-            using var transaction = session.BeginTransaction();
-            IEnumerable<QA> entities = await session
-                .Query<QA>().OrderByDescending(d => d.CreatedAt)
-                .Where(d => d.Status != 404)
-                .ToListAsync();
-
-            transaction.Commit();
 
             //get total count of data in table
             totalRecord = entities.Count();
@@ -105,32 +89,16 @@ namespace TaskManager.Controllers
             [ValidateAntiForgeryToken]
             public async Task<IActionResult> Create(QA entity)
             {
-                if (ModelState.IsValid)
-                {
-                    using var session = FluentNHibernateSession.Instance.OpenSession();
-                    using var transaction = session.BeginTransaction();
-                    await session.SaveAsync(entity);
-                    transaction.Commit();
-                    TempData["success"] = "QA Eng. created successfully!";
-                    return RedirectToAction("Index");
-                }
-                return View(entity);
+                if (!ModelState.IsValid) return View(entity);
+                if (!await _service.CreateEntity(entity)) return View(entity);
+                TempData["success"] = "QA Eng. created successfully!";
+                return RedirectToAction("Index");
             }
 
             public async Task<IActionResult> Edit(Guid? id)
             {
-                if (id == null)
-                {
-                    return NotFound();
-                }
-                using var session = FluentNHibernateSession.Instance.OpenSession();
-                using var transaction = session.BeginTransaction();
-                var entity = await session.GetAsync<QA>(id);
-                transaction.Commit();
-                if (entity == null || entity.Status == 404)
-                {
-                    return NotFound();
-                }
+                var entity = await _service.GetEntity(id);
+                if (entity == null) return NotFound();
                 return View(entity);
             }
 
@@ -138,60 +106,35 @@ namespace TaskManager.Controllers
             [ValidateAntiForgeryToken]
             public async Task<IActionResult> Edit(QA entity)
             {
-                if (ModelState.IsValid)
-                {
-                    using var session = FluentNHibernateSession.Instance.OpenSession();
-                    using var transaction = session.BeginTransaction();
-                    await session.UpdateAsync(entity);
-                    transaction.Commit();
-                    TempData["success"] = "QA Eng. updated successfully!";
-                    return RedirectToAction("Index");
-                }
-                return View(entity);
+                if (!ModelState.IsValid) return View(entity);
+                if (!await _service.UpdateEntity(entity)) return View(entity);
+                TempData["success"] = "Developer updated successfully!";
+                return RedirectToAction("Index");
             }
 
             public async Task<IActionResult> Delete(Guid? id)
             {
-                if (id == null)
-                {
-                    return NotFound();
-                }
-                using var session = FluentNHibernateSession.Instance.OpenSession();
-                using var transaction = session.BeginTransaction();
-                var entity = await session.GetAsync<QA>(id);
-                transaction.Commit();
-                if (entity == null || entity.Status == 404)
-                {
-                    return NotFound();
-                }
-                return PartialView("_QADeletePartial", entity);
+                string qADeletePartial = "_QADeletePartial";
+
+                var entity = await _service.GetEntity(id);
+                if (entity == null) return NotFound();
+
+                return PartialView(qADeletePartial, entity);
             }
 
             [HttpPost, ActionName("Delete")]
             [ValidateAntiForgeryToken]
             public async Task<IActionResult> DeletePost(Guid? id)
             {
-                using var session = FluentNHibernateSession.Instance.OpenSession();
-                using var transaction = session.BeginTransaction();
-                var entity = await session.GetAsync<QA>(id);
-                if (entity == null || entity.Status == 404)
-                {
-                    return NotFound();
-                }
-                entity.Status = 404;
-                await session.SaveAsync(entity);
-                transaction.Commit();
+                if (!await _service.DeleteEntity(id)) return NotFound();
                 TempData["success"] = "QA Eng. deleted successfully!";
                 return RedirectToAction("Index");
             }
 
             public async Task<IActionResult> Details(Guid? id)
             {
-                if (id == null) return NotFound();
-                using var session = FluentNHibernateSession.Instance.OpenSession();
-                using var transaction = session.BeginTransaction();
-                var entity = await session.GetAsync<QA>(id);
-                if (entity == null || entity.Status == 404) return NotFound();
+                var entity = await _service.GetEntity(id);
+                if (entity == null) return NotFound();
                 return View(entity);
             }
 
