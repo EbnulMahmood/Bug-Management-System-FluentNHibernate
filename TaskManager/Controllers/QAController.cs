@@ -22,7 +22,7 @@ namespace TaskManager.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> GetQAList(int draw, int start, int length,
+        public async Task<JsonResult> ListQAs(int draw, int start, int length,
             string filter_keywords, int filter_option = 0)
         {
             var entities = await _service.ListEntities();
