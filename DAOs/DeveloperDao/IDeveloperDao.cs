@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace DAOs.DeveloperDao
-{
+{ 
     public interface IDeveloperDao : IBaseDao<Developer>
     {
         Task<IEnumerable<Developer>> ListEntitiesOrderDescExcludeSoftDelete();

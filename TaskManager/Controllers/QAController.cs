@@ -29,6 +29,7 @@ namespace TaskManager.Controllers
 
             int totalRecord = 0;
             int filterRecord = 0;
+            int deleteStatusCode = 404;
 
             //get total count of data in table
             totalRecord = entities.Count();
@@ -36,12 +37,12 @@ namespace TaskManager.Controllers
             if (!string.IsNullOrEmpty(filter_keywords))
             {
                 entities = entities.Where(d => d.Name.ToLower().Contains(filter_keywords.ToLower()))
-                .Where(d => d.Status != 404);
+                .Where(d => d.Status != deleteStatusCode);
             }
             if (filter_option != 0)
             {
                 entities = entities.Where(d => d.Status == filter_option)
-                .Where(d => d.Status != 404);
+                .Where(d => d.Status != deleteStatusCode);
             }
 
             // get total count of records after search 
@@ -95,9 +96,9 @@ namespace TaskManager.Controllers
                 return RedirectToAction("Index");
             }
 
-            public async Task<IActionResult> Edit(Guid? id)
+            public async Task<IActionResult> Edit(Guid id)
             {
-                var entity = await _service.GetEntity(id);
+                var entity = await _service.LoadEntity(id);
                 if (entity == null) return NotFound();
                 return View(entity);
             }
@@ -112,11 +113,11 @@ namespace TaskManager.Controllers
                 return RedirectToAction("Index");
             }
 
-            public async Task<IActionResult> Delete(Guid? id)
+            public async Task<IActionResult> Delete(Guid id)
             {
                 string qADeletePartial = "_QADeletePartial";
 
-                var entity = await _service.GetEntity(id);
+                var entity = await _service.LoadEntity(id);
                 if (entity == null) return NotFound();
 
                 return PartialView(qADeletePartial, entity);
@@ -124,16 +125,16 @@ namespace TaskManager.Controllers
 
             [HttpPost, ActionName("Delete")]
             [ValidateAntiForgeryToken]
-            public async Task<IActionResult> DeletePost(Guid? id)
+            public async Task<IActionResult> DeletePost(Guid id)
             {
                 if (!await _service.DeleteEntity(id)) return NotFound();
                 TempData["success"] = "QA Eng. deleted successfully!";
                 return RedirectToAction("Index");
             }
 
-            public async Task<IActionResult> Details(Guid? id)
+            public async Task<IActionResult> Details(Guid id)
             {
-                var entity = await _service.GetEntity(id);
+                var entity = await _service.LoadEntity(id);
                 if (entity == null) return NotFound();
                 return View(entity);
             }

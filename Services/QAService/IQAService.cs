@@ -1,4 +1,5 @@
 ﻿using Entities;
+using Services.BaseService;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,12 +9,9 @@ using System.Web.Mvc;
 
 namespace Services.QAService
 {
-    public interface IQAService
+    public interface IQAService : IBaseService<QA>
     {
         Task<IEnumerable<QA>> ListEntities();
-        Task<bool> CreateEntity(QA entity);
-        Task<bool> UpdateEntity(QA entity);
-        Task<QA?> GetEntity(Guid? id);
-        Task<bool> DeleteEntity(Guid? id);
+        Task<bool> DeleteEntity(Guid id);
     }
 }

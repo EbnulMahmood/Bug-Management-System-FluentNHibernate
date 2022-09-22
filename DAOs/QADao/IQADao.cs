@@ -3,16 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DAOs.BaseDao;
 using Entities;
 
 namespace DAOs.QADao
 {
-    public interface IQADao
+    public interface IQADao : IBaseDao<QA>
     {
-        Task<IEnumerable<QA>> ListQAsDescExclude404();
-        Task<bool> CreateQA(QA qAToCreate);
-        Task<bool> UpdateQA(QA qAToUpdate);
-        Task<QA?> GetQAExclude404(Guid? qAToGetId);
-        Task<bool> DeleteQAInclude404(Guid? qAToGetId);
+        Task<IEnumerable<QA>> ListEntitiesOrderDescExcludeSoftDelete();
+        Task<bool> SoftDeleteEntity(Guid id, int deleteStatusCode);
     }
 }

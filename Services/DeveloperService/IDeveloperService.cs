@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Web.Mvc;
 
 namespace Services.DeveloperService
-{
+{ 
     public interface IDeveloperService : IBaseService<Developer>
     {
         Task<IEnumerable<Developer>> ListEntities();

@@ -12,7 +12,7 @@ using Services.BaseService;
 using Entities.BaseEntity;
 
 namespace Services.DeveloperService
-{
+{ 
     public class DeveloperService : BaseService<Developer>, IDeveloperService
     {
         private readonly IDeveloperDao _developerDao;
