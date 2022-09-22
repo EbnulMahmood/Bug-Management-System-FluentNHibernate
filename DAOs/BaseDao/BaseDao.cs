@@ -20,27 +20,6 @@ namespace DAOs.BaseDao
             _criteria = _session.CreateCriteria<T>();
         }
 
-        public async Task<IEnumerable<T>> ListEntities()
-        {
-            using var transaction = _session.BeginTransaction();
-            try
-            {
-                return await _criteria.ListAsync<T>();
-            }
-            catch
-            {
-                await transaction.RollbackAsync();
-                throw new Exception();
-            }
-            finally
-            {
-                if (transaction != null)
-                {
-                    transaction.Dispose();
-                }
-            }
-        }
-
         public async Task<T> LoadEntity(Guid id)
         {
             using var transaction = _session.BeginTransaction();

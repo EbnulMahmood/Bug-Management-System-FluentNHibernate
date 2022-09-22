@@ -10,5 +10,6 @@ namespace DAOs.DeveloperDao
 {
     public interface IDeveloperDao : IBaseDao<Developer>
     {
+        Task<IEnumerable<Developer>> ListEntitiesOrderDescExcludeSoftDelete();
     }
 }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DAOs.BaseDao;
+using Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,28 +10,52 @@ namespace Services.BaseService
 {
     public class BaseService<T> : IBaseService<T> where T : class
     {
-        public BaseService()
+        private readonly IBaseDao<T> _baseDao;
+
+        public BaseService(IBaseDao<T> baseDao)
         {
+            _baseDao = baseDao;
         }
 
-        public Task<bool> CreateEntity(T entity)
+        public async Task<T> LoadEntity(Guid id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                if (id == Guid.Empty) return null;
+                var entity = await _baseDao.LoadEntity(id);
+                if (entity == null) return null;
+                return entity;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
-        public Task<IEnumerable<T>> ListEntitiesOrderDescExcludeSoftDelete()
+        public async Task<bool> CreateEntity(T entity)
         {
-            throw new NotImplementedException();
+            try
+            {
+                if (!await _baseDao.CreateEntity(entity)) return false;
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
-        public Task<T> LoadEntity(Guid id)
+        public async Task<bool> UpdateEntity(T entity)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> UpdateEntity(T entity)
-        {
-            throw new NotImplementedException();
+            try
+            {
+                if (!await _baseDao.UpdateEntity(entity)) return false;
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

@@ -95,7 +95,7 @@ namespace TaskManager.Controllers
 
         public async Task<IActionResult> Edit(Guid id)
         {
-            var entity = await _service.GetEntity(id);
+            var entity = await _service.LoadEntity(id);
             if (entity == null) return NotFound();
             return View(entity);
         }
@@ -114,7 +114,7 @@ namespace TaskManager.Controllers
         {
             string devDeletePartial = "_DevDeletePartial";
 
-            var entity = await _service.GetEntity(id);
+            var entity = await _service.LoadEntity(id);
             if (entity == null) return NotFound();
 
             return PartialView(devDeletePartial, entity);
@@ -132,7 +132,7 @@ namespace TaskManager.Controllers
 
         public async Task<IActionResult> Details(Guid id)
         {
-            var entity = await _service.GetEntity(id);
+            var entity = await _service.LoadEntity(id);
             if (entity == null) return NotFound();
             return View(entity);
         }
