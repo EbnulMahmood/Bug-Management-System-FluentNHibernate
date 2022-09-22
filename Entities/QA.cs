@@ -5,14 +5,12 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Entities.BaseEntity;
 
 namespace Entities
 {
-    public class QA
+    public class QA : BaseEntity<Guid>, IEntity
     {
-        public virtual Guid Id { get; set; }
-        public virtual string Name { get; set; }
         public virtual int Status { get; set; } = 1;
-        public virtual DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }
