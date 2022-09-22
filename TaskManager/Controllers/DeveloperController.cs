@@ -27,6 +27,7 @@ namespace TaskManager.Controllers
             var entities = await _service.ListEntities();
             int totalRecord = 0;
             int filterRecord = 0;
+            int deleteStatusCode = 404;
 
             //get total count of data in table
             totalRecord = entities.Count();
@@ -34,12 +35,12 @@ namespace TaskManager.Controllers
             if (!string.IsNullOrEmpty(filter_keywords))
             {
                 entities = entities.Where(d => d.Name.ToLower().Contains(filter_keywords.ToLower()))
-                .Where(d => d.Status != 404);
+                .Where(d => d.Status != deleteStatusCode);
             }
             if (filter_option != 0)
             {
                 entities = entities.Where(d => d.Status == filter_option)
-                .Where(d => d.Status != 404);
+                .Where(d => d.Status != deleteStatusCode);
             }
 
             // get total count of records after search 
@@ -124,8 +125,7 @@ namespace TaskManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeletePost(Guid id)
         {
-            int deleteStatusCode = 404; 
-            if (!await _service.SoftDeleteEntity(id, deleteStatusCode)) return NotFound();
+            if (!await _service.DeleteEntity(id)) return NotFound();
             TempData["success"] = "Developer deleted successfully!";
             return RedirectToAction("Index");
         }

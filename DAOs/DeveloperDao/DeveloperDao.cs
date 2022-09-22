@@ -42,5 +42,37 @@ namespace DAOs.DeveloperDao
                 }
             }
         }
+
+        public async Task<bool> SoftDeleteEntity(Guid id, int deleteStatusCode)
+        {
+            using var transaction = _session.BeginTransaction();
+            try
+            {
+                var entityList = await _criteria.Add(Restrictions.Eq("Id", id))
+                    .SetMaxResults(1)
+                    .ListAsync<Developer>();
+
+                var entity = entityList.First(); // get first entity from list
+
+                if (entity == null || entity.Status == deleteStatusCode) return false;
+                entity.Status = deleteStatusCode;
+                await _session.UpdateAsync(entity);
+                await transaction.CommitAsync();
+
+                return true;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw new Exception();
+            }
+            finally
+            {
+                if (transaction != null)
+                {
+                    transaction.Dispose();
+                }
+            }
+        }
     }
 }

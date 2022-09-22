@@ -12,6 +12,6 @@ namespace Services.DeveloperService
     public interface IDeveloperService : IBaseService<Developer>
     {
         Task<IEnumerable<Developer>> ListEntities();
-        Task<bool> SoftDeleteEntity(Guid id, int deleteStatusCode);
+        Task<bool> DeleteEntity(Guid id);
     }
 }

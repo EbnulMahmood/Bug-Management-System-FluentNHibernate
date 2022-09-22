@@ -9,6 +9,7 @@ using NHibernate.Linq;
 using System.Web.Mvc;
 using DAOs.DeveloperDao;
 using Services.BaseService;
+using Entities.BaseEntity;
 
 namespace Services.DeveloperService
 {
@@ -33,15 +34,12 @@ namespace Services.DeveloperService
             }
         }
 
-        public async Task<bool> SoftDeleteEntity(Guid id, int deleteStatusCode)
+        public async Task<bool> DeleteEntity(Guid id)
         {
             try
             {
-                if (id == Guid.Empty) return false; 
-                var entiry = await _developerDao.LoadEntity(id);
-                if (entiry == null) return false;
-                entiry.Status = deleteStatusCode;
-                if (!await _developerDao.UpdateEntity(entiry)) return false;
+                int deleteStatusCode = 404; // status for delete 404
+                if (!await _developerDao.SoftDeleteEntity(id, deleteStatusCode)) return false;
                 return true;
             }
             catch
