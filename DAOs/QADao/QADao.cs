@@ -101,7 +101,12 @@ namespace DAOs.QADao
             int deleteStatus = 404;
             try
             {
-                var entity = await _session.GetAsync<QA>(qAToGetId);
+                // var entity = await _session.GetAsync<QA>(qAToGetId);
+                var devList = await _qACriteria.Add(Restrictions.Eq("Id", qAToGetId))
+                    .SetMaxResults(1)
+                    .ListAsync<QA>();
+
+                var entity = devList.First(); // get first entity from list
 
                 if (entity == null || entity.Status == deleteStatus) return false;
                 entity.Status = deleteStatus;
@@ -130,7 +135,12 @@ namespace DAOs.QADao
             int deleteStatus = 404;
             try
             {
-                var entity = await _session.GetAsync<QA>(qAToGetId);
+                // var entity = await _session.GetAsync<QA>(qAToGetId);
+                var devList = await _qACriteria.Add(Restrictions.Eq("Id", qAToGetId))
+                    .SetMaxResults(1)
+                    .ListAsync<QA>();
+
+                var entity = devList.First(); // get first entity from list
 
                 if (entity == null || entity.Status == deleteStatus) return null;
                 await transaction.CommitAsync();

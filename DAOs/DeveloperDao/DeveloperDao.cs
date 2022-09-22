@@ -1,6 +1,8 @@
 ﻿using Entities;
 using NHibernate;
 using NHibernate.Criterion;
+using static NHibernate.Impl.CriteriaImpl;
+using System;
 
 namespace DAOs.DeveloperDao
 {
@@ -97,7 +99,12 @@ namespace DAOs.DeveloperDao
             int deleteStatus = 404;
             try
             {
-                var entity = await _session.GetAsync<Developer>(developerToGetId);
+                // var entity = await _session.GetAsync<Developer>(developerToGetId);
+                var devList = await _developerCriteria.Add(Restrictions.Eq("Id", developerToGetId))
+                    .SetMaxResults(1)
+                    .ListAsync<Developer>();
+
+                var entity = devList.First(); // get first entity from list
 
                 if (entity == null || entity.Status == deleteStatus) return false;
                 entity.Status = deleteStatus;
@@ -126,7 +133,13 @@ namespace DAOs.DeveloperDao
             int deleteStatus = 404;
             try
             {
-                var entity = await _session.GetAsync<Developer>(developerToGetId);
+                // var entity = await _session.GetAsync<Developer>(developerToGetId);
+
+                var devList = await _developerCriteria.Add(Restrictions.Eq("Id", developerToGetId))
+                    .SetMaxResults(1)
+                    .ListAsync<Developer>();
+
+                var entity = devList.First(); // get first entity from list
 
                 if (entity == null || entity.Status == deleteStatus) return null;
                 await transaction.CommitAsync();
