@@ -93,7 +93,7 @@ namespace TaskManager.Controllers
             return RedirectToAction("Index");
         }
 
-        public async Task<IActionResult> Edit(Guid? id)
+        public async Task<IActionResult> Edit(Guid id)
         {
             var entity = await _service.GetEntity(id);
             if (entity == null) return NotFound();
@@ -110,7 +110,7 @@ namespace TaskManager.Controllers
             return RedirectToAction("Index");
         }
 
-        public async Task<IActionResult> Delete(Guid? id)
+        public async Task<IActionResult> Delete(Guid id)
         {
             string devDeletePartial = "_DevDeletePartial";
 
@@ -122,14 +122,15 @@ namespace TaskManager.Controllers
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeletePost(Guid? id)
+        public async Task<IActionResult> DeletePost(Guid id)
         {
-            if (!await _service.DeleteEntity(id)) return NotFound();
+            int deleteStatusCode = 404; 
+            if (!await _service.SoftDeleteEntity(id, deleteStatusCode)) return NotFound();
             TempData["success"] = "Developer deleted successfully!";
             return RedirectToAction("Index");
         }
 
-        public async Task<IActionResult> Details(Guid? id)
+        public async Task<IActionResult> Details(Guid id)
         {
             var entity = await _service.GetEntity(id);
             if (entity == null) return NotFound();

@@ -21,7 +21,11 @@ namespace Services.DeveloperService
 
         public async Task<IEnumerable<Developer>> ListEntities()
         {
-            var entities = await _developerDao.ListDevelopersDescExclude404();
+            IEnumerable<Developer> developersList = await _developerDao.ListEntities();
+
+            int deleteStatusCode = 404; // status delete code 404
+            var entities = developersList.OrderByDescending(d => d.CreatedAt)
+                .Where(d => d.Status != deleteStatusCode).ToList();
 
             return entities;
         }
@@ -30,7 +34,7 @@ namespace Services.DeveloperService
         {
             try
             {
-                if(!await _developerDao.CreateDeveloper(entity)) return false;
+                if(!await _developerDao.CreateEntity(entity)) return false;
                 return true;
             }
             catch
@@ -43,7 +47,7 @@ namespace Services.DeveloperService
         {
             try
             {
-                if (!await _developerDao.UpdateDeveloper(entity)) return false;
+                if (!await _developerDao.UpdateEntity(entity)) return false;
                 return true;
             }
             catch
@@ -52,11 +56,15 @@ namespace Services.DeveloperService
             }
         }
 
-        public async Task<bool> DeleteEntity(Guid? id)
+        public async Task<bool> SoftDeleteEntity(Guid id, int deleteStatusCode)
         {
             try
             {
-                if (!await _developerDao.DeleteDeveloperInclude404(id)) return false;
+                if (id == Guid.Empty) return false; 
+                var entiry = await _developerDao.LoadEntity(id);
+                if (entiry == null) return false;
+                entiry.Status = deleteStatusCode;
+                if (!await _developerDao.UpdateEntity(entiry)) return false;
                 return true;
             }
             catch
@@ -65,13 +73,12 @@ namespace Services.DeveloperService
             }
         }
 
-        public async Task<Developer?> GetEntity(Guid? id)
+        public async Task<Developer?> GetEntity(Guid id)
         {
             try
             {
-                if (id == null) return null;
-
-                var entity = await _developerDao.GetDeveloperExclude404(id);
+                if (id == Guid.Empty) return null;
+                var entity = await _developerDao.LoadEntity(id);
                 if (entity == null) return null;
                 return entity;
             }

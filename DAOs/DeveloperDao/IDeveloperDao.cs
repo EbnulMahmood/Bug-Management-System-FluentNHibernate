@@ -1,4 +1,5 @@
-﻿using Entities;
+﻿using DAOs.BaseDao;
+using Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,12 +8,7 @@ using System.Threading.Tasks;
 
 namespace DAOs.DeveloperDao
 {
-    public interface IDeveloperDao
+    public interface IDeveloperDao : IBaseDao<Developer>
     {
-        Task<IEnumerable<Developer>> ListDevelopersDescExclude404();
-        Task<bool> CreateDeveloper(Developer developerToCreate);
-        Task<bool> UpdateDeveloper(Developer developerToUpdate);
-        Task<Developer?> GetDeveloperExclude404(Guid? developerToGetId);
-        Task<bool> DeleteDeveloperInclude404(Guid? developerToGetId);
     }
 }

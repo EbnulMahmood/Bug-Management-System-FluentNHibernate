@@ -13,7 +13,7 @@ namespace Services.DeveloperService
         Task<IEnumerable<Developer>> ListEntities();
         Task<bool> CreateEntity(Developer entity);
         Task<bool> UpdateEntity(Developer entity);
-        Task<Developer?> GetEntity(Guid? id);
-        Task<bool> DeleteEntity(Guid? id);
+        Task<Developer?> GetEntity(Guid id);
+        Task<bool> SoftDeleteEntity(Guid id, int deleteStatusCode);
     }
 }

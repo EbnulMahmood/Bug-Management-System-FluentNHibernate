@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Entities;
 using NHibernate;
 using NHibernate.Criterion;
-
+ 
 namespace DAOs.QADao
 {
     public class QADao : IQADao
