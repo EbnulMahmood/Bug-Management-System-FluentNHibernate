@@ -5,6 +5,7 @@ using FluentNHibernate.Cfg.Db;
 using Mappings;
 using Microsoft.Extensions.DependencyInjection;
 using NHibernate;
+using NHibernate.Tool.hbm2ddl;
 using Services.DeveloperService;
 using Services.QAService;
 using System;
@@ -17,17 +18,32 @@ namespace Extensions
 {
     public static class FluentNHibernateExtensions
     {
-        public static IServiceCollection AddFluentNHibernate(this IServiceCollection services, string connectionString)
+        public static IServiceCollection AddFluentNHibernate(this IServiceCollection services,
+            string connectionString, string DevelopmentEnvironment)
         {
-            var sessionFactory = Fluently.Configure()
-                .Database(MsSqlConfiguration.MsSql2012
-                .ConnectionString(connectionString))
-                .Mappings(m =>
-                {
-                    m.FluentMappings.AddFromAssemblyOf<DeveloperMap>();
-                    m.FluentMappings.AddFromAssemblyOf<QAMap>();
-                })
-                .BuildSessionFactory();
+            ISessionFactory sessionFactory;
+            if (DevelopmentEnvironment == "home") {
+                sessionFactory = Fluently.Configure()
+                    .Database(MsSqlConfiguration.MsSql2012
+                    .ConnectionString(connectionString))
+                    .Mappings(m =>
+                    {
+                        m.FluentMappings.AddFromAssemblyOf<DeveloperMap>();
+                        m.FluentMappings.AddFromAssemblyOf<QAMap>();
+                    })
+                    .BuildSessionFactory();
+            } else {
+                sessionFactory = Fluently.Configure()
+                    .Database(
+                    SQLiteConfiguration.Standard
+                    .UsingFile("TaskManager.db"))
+                    .Mappings(m =>
+                    {
+                        m.FluentMappings.AddFromAssemblyOf<DeveloperMap>();
+                        m.FluentMappings.AddFromAssemblyOf<QAMap>();
+                    })
+                    .BuildSessionFactory();
+            }
 
             services.AddSingleton(sessionFactory);
             services.AddScoped(factory => sessionFactory.OpenSession());

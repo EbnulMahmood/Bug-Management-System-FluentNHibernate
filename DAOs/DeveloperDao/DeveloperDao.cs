@@ -19,12 +19,15 @@ namespace DAOs.DeveloperDao
         {
             using var transaction = _session.BeginTransaction();
             int deleteStatus = 404;
+            string descOrderBy = "CreatedAt";
             try
             {
-                IEnumerable<Developer> entities = await _criteria
-                    .AddOrder(Order.Desc("CreatedAt"))
-                    .Add(!Restrictions.Eq("Status", deleteStatus))
-                    .ListAsync<Developer>();
+                IQuery sqlQuery = _session.CreateSQLQuery($"SELECT * FROM Developers " +
+                    $"WHERE NOT Status={deleteStatus} " +
+                    $"ORDER BY {descOrderBy} DESC")
+                    .AddEntity(typeof(Developer));
+
+                IEnumerable<Developer> entities = await sqlQuery.ListAsync<Developer>();
                 await transaction.CommitAsync();
 
                 return entities;
@@ -48,10 +51,12 @@ namespace DAOs.DeveloperDao
             using var transaction = _session.BeginTransaction();
             try
             {
-                var entityList = await _criteria.Add(Restrictions.Eq("Id", id))
-                    .SetMaxResults(1)
-                    .ListAsync<Developer>();
+                IQuery sqlQuery = _session.CreateSQLQuery($"SELECT * FROM Developers " +
+                    $"WHERE NOT Status={deleteStatusCode} " +
+                    $"AND Id='{id}'")
+                    .AddEntity(typeof(Developer));
 
+                var entityList = await sqlQuery.ListAsync<Developer>();
                 var entity = entityList.First(); // get first entity from list
 
                 if (entity == null || entity.Status == deleteStatusCode) return false;
