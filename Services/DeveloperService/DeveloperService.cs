@@ -1,18 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NHibernate.Linq;
-using System.Web.Mvc;
+﻿using Entities;
 using DAOs.DeveloperDao;
 using Services.BaseService;
-using Entities.BaseEntity;
 
 namespace Services.DeveloperService
-{ 
+{
     public class DeveloperService : BaseService<Developer>, IDeveloperService
     {
         private readonly IDeveloperDao _developerDao;

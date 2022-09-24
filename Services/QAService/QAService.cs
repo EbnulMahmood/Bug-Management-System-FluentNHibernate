@@ -1,12 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NHibernate.Linq;
-using System.Web.Mvc;
+﻿using Entities;
 using DAOs.QADao;
 using Services.BaseService;
 

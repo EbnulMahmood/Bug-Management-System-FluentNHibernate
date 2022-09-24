@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using DAOs.BaseDao;
+﻿using DAOs.BaseDao;
 using Entities;
 using NHibernate;
 using NHibernate.Criterion;
- 
+
 namespace DAOs.QADao
-{ 
+{
     public class QADao : BaseDao<QA>, IQADao
     {
         private readonly ISession _session;

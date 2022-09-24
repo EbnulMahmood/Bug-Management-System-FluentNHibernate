@@ -17,7 +17,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Services", "Services\Servic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DAOs", "DAOs\DAOs.csproj", "{1813FAA3-A4E9-4A8C-AC41-EFC403F53ED6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extensions", "Extensions\Extensions.csproj", "{B86074DD-FB52-4119-A818-C5A67083BB9C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Extensions", "Extensions\Extensions.csproj", "{B86074DD-FB52-4119-A818-C5A67083BB9C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Validations", "Validations\Validations.csproj", "{D0105A8C-AFAD-43C3-B5CD-8D36FDC265F3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,6 +59,10 @@ Global
 		{B86074DD-FB52-4119-A818-C5A67083BB9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B86074DD-FB52-4119-A818-C5A67083BB9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B86074DD-FB52-4119-A818-C5A67083BB9C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0105A8C-AFAD-43C3-B5CD-8D36FDC265F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0105A8C-AFAD-43C3-B5CD-8D36FDC265F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0105A8C-AFAD-43C3-B5CD-8D36FDC265F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0105A8C-AFAD-43C3-B5CD-8D36FDC265F3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

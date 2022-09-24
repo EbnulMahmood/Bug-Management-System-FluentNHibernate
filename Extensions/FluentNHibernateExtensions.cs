@@ -34,9 +34,8 @@ namespace Extensions
                     .BuildSessionFactory();
             } else {
                 sessionFactory = Fluently.Configure()
-                    .Database(
-                    SQLiteConfiguration.Standard
-                    .UsingFile("TaskManager.db"))
+                    .Database(MsSqlConfiguration.MsSql2012
+                    .ConnectionString(connectionString))
                     .Mappings(m =>
                     {
                         m.FluentMappings.AddFromAssemblyOf<DeveloperMap>();

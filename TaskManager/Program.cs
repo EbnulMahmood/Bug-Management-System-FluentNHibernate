@@ -6,7 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 // set environment for dev
-string DevelopmentEnvironment = "home";
+string DevelopmentEnvironment = "office";
 
 string defaultConnection;
 if (DevelopmentEnvironment == "home") {
