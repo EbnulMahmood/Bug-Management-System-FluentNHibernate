@@ -19,30 +19,17 @@ namespace Extensions
     public static class FluentNHibernateExtensions
     {
         public static IServiceCollection AddFluentNHibernate(this IServiceCollection services,
-            string connectionString, string DevelopmentEnvironment)
+            string connectionString)
         {
-            ISessionFactory sessionFactory;
-            if (DevelopmentEnvironment == "home") {
-                sessionFactory = Fluently.Configure()
-                    .Database(MsSqlConfiguration.MsSql2012
-                    .ConnectionString(connectionString))
-                    .Mappings(m =>
-                    {
-                        m.FluentMappings.AddFromAssemblyOf<DeveloperMap>();
-                        m.FluentMappings.AddFromAssemblyOf<QAMap>();
-                    })
-                    .BuildSessionFactory();
-            } else {
-                sessionFactory = Fluently.Configure()
-                    .Database(MsSqlConfiguration.MsSql2012
-                    .ConnectionString(connectionString))
-                    .Mappings(m =>
-                    {
-                        m.FluentMappings.AddFromAssemblyOf<DeveloperMap>();
-                        m.FluentMappings.AddFromAssemblyOf<QAMap>();
-                    })
-                    .BuildSessionFactory();
-            }
+            var sessionFactory = Fluently.Configure()
+                .Database(MsSqlConfiguration.MsSql2012
+                .ConnectionString(connectionString))
+                .Mappings(m =>
+                {
+                    m.FluentMappings.AddFromAssemblyOf<DeveloperMap>();
+                    m.FluentMappings.AddFromAssemblyOf<QAMap>();
+                })
+                .BuildSessionFactory();
 
             services.AddSingleton(sessionFactory);
             services.AddScoped(factory => sessionFactory.OpenSession());

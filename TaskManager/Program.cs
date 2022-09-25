@@ -6,18 +6,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 // set environment for dev
-string DevelopmentEnvironment = "office";
 
-string defaultConnection;
-if (DevelopmentEnvironment == "home") {
-    defaultConnection = builder.Configuration.GetConnectionString("HomeConnection");
-} else {
-    defaultConnection = builder.Configuration.GetConnectionString("DefaultConnection");
-}
+// string defaultConnection = builder.Configuration.GetConnectionString("HomeConnection");
+string defaultConnection = builder.Configuration.GetConnectionString("DefaultConnection");
 
 if (string.IsNullOrEmpty(defaultConnection)) throw new Exception("Missing connection string");
 
-builder.Services.AddFluentNHibernate(defaultConnection, DevelopmentEnvironment);
+builder.Services.AddFluentNHibernate(defaultConnection);
 
 var app = builder.Build();
 
